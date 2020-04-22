@@ -1,0 +1,4 @@
+Starting program: C:\Users\TJohn\AppData\Local\Temp\PointsCreation.exe 
+[New Thread 11396.0x5184]
+[New Thread 11396.0x3a90]
+[Inferior 1 (process 11396) exited normally]
