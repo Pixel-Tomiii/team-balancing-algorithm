@@ -78,14 +78,14 @@ void reset() {
 
 // Adds a player to the given team.
 void addPlayer(Team *team, Player *player) {
-    if (MAX_TEAM_SIZE > team -> playerCount) {
-        team -> players[team -> playerCount++] = player;
-        team -> totalElo += player -> elo;
-        player -> team = team;
+    if (MAX_TEAM_SIZE > team->playerCount) {
+        team->players[team->playerCount++] = player;
+        team->totalElo += player->elo;
+        player->team = team;
     }
 
     else {
-        printf("ERROR: Team %s is full!", team -> id);
+        printf("ERROR: Team %s is full!", team->id);
     }
 }
 
@@ -95,24 +95,24 @@ void addPlayer(Team *team, Player *player) {
 // middle it moves the last element to the empty slot.
 void removePlayer(Team *team, int id) {
     // Looping through the players (linear search).
-    for (int i = 0; i < team -> playerCount; i++) {
+    for (int i = 0; i < team->playerCount; i++) {
 
-        if (team -> players[i] -> id == id) {
+        if (team->players[i]->id == id) {
 
             // Update the team elo.
-            team -> totalElo -= team -> players[i] -> elo;
+            team->totalElo -= team->players[i]->elo;
 
             // The the player is in the middle/start of the array, replace it
             // with the last player in the array.
-            if (i + 1 != team -> playerCount) {
-                team -> players[i] = team -> players[team -> playerCount-- - 1];
-                team -> players[team -> playerCount] = 0;
+            if (i + 1 != team->playerCount) {
+                team->players[i] = team->players[team->playerCount-- - 1];
+                team->players[team->playerCount] = 0;
                 break;
             }
 
             // Else remove the last player.
             else {
-                team -> players[--team -> playerCount] = 0;
+                team->players[--team->playerCount] = 0;
             }
         }
     }
@@ -139,7 +139,7 @@ void getSubsets(Team *team) {
     int bitsForNumber;
     int setBits;
 
-    for (int number = 1; number < (1 << team -> playerCount); number++) {
+    for (int number = 1; number < (1 << team->playerCount); number++) {
 
         Sum sum = {0};
 
@@ -153,13 +153,13 @@ void getSubsets(Team *team) {
             for (int bit = 0; bit <= bitsForNumber; bit++) {
                 // Only adding the player's elo if the current bit is set.
                 if ((number >> bit) & 1) {
-                    Player *player = team -> players[team -> playerCount - bit - 1];
-                    sum.sum += player -> elo;
+                    Player *player = team->players[team->playerCount - bit - 1];
+                    sum.sum += player->elo;
                     sum.players[sum.numPlayers++] = player;
                 }
             }
 
-            team -> subsets[team -> totalSums++] = sum;
+            team->subsets[team->totalSums++] = sum;
         }
     }
 }
@@ -207,12 +207,12 @@ void setupTeams() {
 
 // Outputs the players and their elos and the total elo for the given team.
 void outputTeam(Team *team) {
-    printf("====================\nTeam: %s -> Expected = %d%%\n", team -> id, team -> expected);
-    for (int i = 0; i < team -> playerCount; i++) {
-        printf("Player %d: %d\n", team -> players[i] -> id, team -> players[i] -> elo);
+    printf("====================\nTeam: %s->Expected = %d%%\n", team->id, team->expected);
+    for (int i = 0; i < team->playerCount; i++) {
+        printf("Player %d: %d\n", team->players[i]->id, team->players[i]->elo);
     }
 
-    printf("\nTotal Elo: %d\n\n", team -> totalElo);
+    printf("\nTotal Elo: %d\n\n", team->totalElo);
 }
 
 
@@ -222,17 +222,17 @@ void outputTeam(Team *team) {
 void swapPlayers(Sum *removeFromTeam1, Sum *removeFromTeam2, Team *team1, Team *team2) {
 
     // Fetches the number of players to swap (total is equal for but 'Sums').
-    int numPlayersToSwap = removeFromTeam1 -> numPlayers;
+    int numPlayersToSwap = removeFromTeam1->numPlayers;
 
     // Swapping the players.
     for (int i = 0; i < numPlayersToSwap; i++) {
 
         // Removing BEFORE adding.
-        removePlayer(team1, removeFromTeam1 -> players[i] -> id);
-        removePlayer(team2, removeFromTeam2 -> players[i] -> id);
+        removePlayer(team1, removeFromTeam1->players[i]->id);
+        removePlayer(team2, removeFromTeam2->players[i]->id);
 
-        addPlayer(team1, removeFromTeam2 -> players[i]);
-        addPlayer(team2, removeFromTeam1 -> players[i]);
+        addPlayer(team1, removeFromTeam2->players[i]);
+        addPlayer(team2, removeFromTeam1->players[i]);
     }
 }
 
@@ -257,19 +257,19 @@ void balanceTeams() {
     Sum team1Swap;
     Sum team2Swap;
 
-    int difference = (team1 -> totalElo - team2 -> totalElo) / 2;
+    int difference = (team1->totalElo - team2->totalElo) / 2;
     int smallest = 0;
 
     // Looping through the subsets for both teams to determine which players to swap to balance the teams.
-    for (int team1Subset = 0; team1Subset < team1 -> totalSums; team1Subset ++) {
-        for (int team2Subset = 0; team2Subset < team2 -> totalSums; team2Subset++) {
+    for (int team1Subset = 0; team1Subset < team1->totalSums; team1Subset ++) {
+        for (int team2Subset = 0; team2Subset < team2->totalSums; team2Subset++) {
 
-            Sum *team1CurrentSubset = &(team1 -> subsets[team1Subset]);
-            Sum *team2CurrentSubset = &(team2 -> subsets[team2Subset]);
+            Sum *team1CurrentSubset = &(team1->subsets[team1Subset]);
+            Sum *team2CurrentSubset = &(team2->subsets[team2Subset]);
 
             // Only comparing if the number of players in each subset is equal.
-            if (team1CurrentSubset -> numPlayers == team2CurrentSubset -> numPlayers) {
-                int diff = (team1CurrentSubset -> sum) - (team2CurrentSubset -> sum);
+            if (team1CurrentSubset->numPlayers == team2CurrentSubset->numPlayers) {
+                int diff = (team1CurrentSubset->sum) - (team2CurrentSubset->sum);
 
                 // If the 'diff', is closer to the difference than the previous closest.
                 if (diff <= difference && diff > smallest) {
@@ -284,8 +284,8 @@ void balanceTeams() {
     swapPlayers(&team1Swap, &team2Swap, team1, team2);
 
     // Uses the expected win formula for Elo.
-    team1 -> expected = (int) round(100 * (1 / (1 + pow(10, (team2 -> totalElo - team1 -> totalElo) / 400.0))));
-    team2 -> expected = 100 - team1 -> expected;
+    team1->expected = (int) round(100 * (1 / (1 + pow(10, (team2->totalElo - team1->totalElo) / 400.0))));
+    team2->expected = 100 - team1->expected;
 
 }
 
